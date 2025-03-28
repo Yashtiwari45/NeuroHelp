@@ -5,3 +5,15 @@ Alzheimer's disease is a progressive neurological disorder that leads to the deg
 
 # Neuro-Sage
 
+## Running the Application
+
+### Development Mode
+
+To run the application in development mode:
+```bash
+npm i
+```
+
+```
+npm run dev
+```
