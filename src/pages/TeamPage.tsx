@@ -73,7 +73,7 @@ const TeamPage = () => {
           const nextIndex = prevIndex + 1;
           return nextIndex >= maxIndex ? 0 : nextIndex;
         });
-      }, 3000);
+      }, 2000);
 
       return () => clearInterval(interval);
     }
