@@ -59,20 +59,17 @@ const teamMembers: TeamMember[] = [
   }
 ];
 
-// Create a modified array that adds duplicates for smooth infinite scrolling
 const extendedTeamMembers = [...teamMembers, ...teamMembers.slice(0, 3)];
 
-const TeamCarousel = () => {
+const TeamPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const maxIndex = teamMembers.length;
 
-  // Automatic sliding
   useEffect(() => {
     if (!isPaused) {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => {
-          // Move to next index, or back to 0 if we've shown all members
           const nextIndex = prevIndex + 1;
           return nextIndex >= maxIndex ? 0 : nextIndex;
         });
@@ -82,7 +79,6 @@ const TeamCarousel = () => {
     }
   }, [isPaused, maxIndex]);
 
-  // For easy access to member card CSS
   const memberCardStyle = "bg-gray-800/50 rounded-xl overflow-hidden flex flex-col h-full transition-all duration-500";
 
   return (
@@ -95,7 +91,6 @@ const TeamCarousel = () => {
         </p>
       </div>
 
-      {/* Carousel Container */}
       <div
         className="relative max-w-6xl mx-auto px-4"
         onMouseEnter={() => setIsPaused(true)}
@@ -162,7 +157,6 @@ const TeamCarousel = () => {
           </div>
         </div>
 
-        {/* Indicator Dots */}
         <div className="flex justify-center mt-6">
           {teamMembers.map((_, index) => (
             <button
@@ -178,4 +172,4 @@ const TeamCarousel = () => {
   );
 };
 
-export default TeamCarousel;
+export default TeamPage;
