@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Github, Linkedin, Mail } from 'lucide-react';
 
 interface TeamMember {
@@ -45,8 +45,8 @@ const teamMembers: TeamMember[] = [
       github: "https://github.com/Yashtiwari45",
       linkedin: "https://www.linkedin.com/in/yogeshwar-tiwari-a62645265/",
       email: "mailto:yasht3439@gmail.com"
-  }
-},{
+    }
+  }, {
     name: "Aditya Chaple",
     role: "Database Manager",
     image: "public/Aditya.jpg",
@@ -59,9 +59,34 @@ const teamMembers: TeamMember[] = [
   }
 ];
 
-function TeamPage() {
+// Create a modified array that adds duplicates for smooth infinite scrolling
+const extendedTeamMembers = [...teamMembers, ...teamMembers.slice(0, 3)];
+
+const TeamCarousel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const maxIndex = teamMembers.length;
+
+  // Automatic sliding
+  useEffect(() => {
+    if (!isPaused) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => {
+          // Move to next index, or back to 0 if we've shown all members
+          const nextIndex = prevIndex + 1;
+          return nextIndex >= maxIndex ? 0 : nextIndex;
+        });
+      }, 3000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isPaused, maxIndex]);
+
+  // For easy access to member card CSS
+  const memberCardStyle = "bg-gray-800/50 rounded-xl overflow-hidden flex flex-col h-full transition-all duration-500";
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 py-8">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">Our Team</h1>
         <p className="text-xl text-gray-400 max-w-2xl mx-auto">
@@ -70,56 +95,87 @@ function TeamPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {teamMembers.map((member) => (
-          <div key={member.name} className="bg-gray-800/50 rounded-xl overflow-hidden">
-            <img
-              src={member.image}
-              alt={member.name}
-              className="w-full h-64 object-cover"
-            />
-            <div className="p-6 space-y-4">
-              <div>
-                <h3 className="text-xl font-semibold">{member.name}</h3>
-                <p className="text-blue-400">{member.role}</p>
+      {/* Carousel Container */}
+      <div
+        className="relative max-w-6xl mx-auto px-4"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div className="overflow-hidden">
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${(currentIndex * (100 / 3))}%)` }}
+          >
+            {extendedTeamMembers.map((member, index) => (
+              <div
+                key={index}
+                className="w-1/3 flex-shrink-0 p-2"
+              >
+                <div className={memberCardStyle}>
+                  <div className="relative pb-2/3">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-64 object-cover"
+                    />
+                  </div>
+                  <div className="p-4 space-y-3 flex flex-col flex-grow">
+                    <div>
+                      <h3 className="text-lg font-semibold">{member.name}</h3>
+                      <p className="text-blue-400 text-sm">{member.role}</p>
+                    </div>
+                    <p className="text-gray-400 text-sm flex-grow">{member.bio}</p>
+                    <div className="flex gap-3 mt-auto">
+                      {member.social.github && (
+                        <a
+                          href={member.social.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          <Github className="w-5 h-5" />
+                        </a>
+                      )}
+                      {member.social.linkedin && (
+                        <a
+                          href={member.social.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          <Linkedin className="w-5 h-5" />
+                        </a>
+                      )}
+                      {member.social.email && (
+                        <a
+                          href={member.social.email}
+                          className="text-gray-400 hover:text-white transition-colors"
+                        >
+                          <Mail className="w-5 h-5" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p className="text-gray-400">{member.bio}</p>
-              <div className="flex gap-4">
-                {member.social.github && (
-                  <a
-                    href={member.social.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <Github className="w-5 h-5" />
-                  </a>
-                )}
-                {member.social.linkedin && (
-                  <a
-                    href={member.social.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <Linkedin className="w-5 h-5" />
-                  </a>
-                )}
-                {member.social.email && (
-                  <a
-                    href={member.social.email}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    <Mail className="w-5 h-5" />
-                  </a>
-                )}
-              </div>
-            </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Indicator Dots */}
+        <div className="flex justify-center mt-6">
+          {teamMembers.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-3 h-3 mx-1 rounded-full ${currentIndex === index ? 'bg-blue-500' : 'bg-gray-400'} transition-colors duration-300`}
+              aria-label={`Show team members starting from position ${index + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
 
-export default TeamPage;
+export default TeamCarousel;
