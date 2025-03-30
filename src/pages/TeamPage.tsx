@@ -15,35 +15,46 @@ interface TeamMember {
 
 const teamMembers: TeamMember[] = [
   {
-    name: "Dr. Sarah Chen",
+    name: "Vedant Kohad",
     role: "Lead AI Researcher",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+    image: "public/Vedant.jpg",
     bio: "Specializing in deep learning and medical image analysis with over 10 years of experience in AI applications for healthcare.",
     social: {
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      email: "mailto:sarah@example.com"
+      github: "https://github.com/kohadved",
+      linkedin: "https://www.linkedin.com/in/vedant-kohad/",
+      email: "mailto:kohadvd@rknec.edu"
     }
   },
   {
-    name: "Dr. Michael Rodriguez",
-    role: "Neurologist",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
-    bio: "Board-certified neurologist with expertise in neurodegenerative diseases and early detection of Alzheimer's disease.",
+    name: "Ayush Lochan",
+    role: "UI Designer and Backend Developer",
+    image: "public/Ayush.jpg",
+    bio: "Passionate about web development and machine learning, focusing on using AI to create innovative, impactful applications that solve real-world problems. Always exploring new technologies to drive progress.",
     social: {
-      linkedin: "https://linkedin.com",
-      email: "mailto:michael@example.com"
+      github: "https://github.com/AyushLochan",
+      linkedin: "https://www.linkedin.com/in/ayush-lochan-9b63a4276/",
+      email: "mailto:ayushlochan4u@gmail.com"
     }
   },
   {
-    name: "Emma Thompson",
-    role: "ML Engineer",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400",
-    bio: "Focused on developing and optimizing machine learning models for medical image analysis and diagnosis.",
+    name: "Yogeshwar Tiwari",
+    role: "Learner in Web Development & Machine Learning",
+    image: "public/Yogeshwar.jpg",
+    bio: "Passionate about web development and machine learning, actively exploring AI-driven solutions with a focus on creating impactful and innovative applications.",
     social: {
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      email: "mailto:emma@example.com"
+      github: "https://github.com/Yashtiwari45",
+      linkedin: "https://www.linkedin.com/in/yogeshwar-tiwari-a62645265/",
+      email: "mailto:yasht3439@gmail.com"
+  }
+},{
+    name: "Aditya Chaple",
+    role: "Database Manager",
+    image: "public/Aditya.jpg",
+    bio: "Experienced Database Manager skilled in optimizing and managing data systems to ensure efficiency and security. Passionate about leveraging data to drive informed decision-making and business growth.",
+    social: {
+      github: "https://github.com/aditya-chaple",
+      linkedin: "https://www.linkedin.com/in/aditya-rajesh-chaple/",
+      email: "mailto:chaplear@rknec.edu"
     }
   }
 ];
