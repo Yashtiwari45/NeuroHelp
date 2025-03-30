@@ -14,4 +14,8 @@ export async function generateVideo(
   // For now, return a placeholder link.
   console.log("Video generation called with:", { videoScript, topic, language });
   return "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_ID";
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> a7139568f8728f93302f3edb204cc7e3f12eb971
