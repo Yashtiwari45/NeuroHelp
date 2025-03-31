@@ -17,3 +17,14 @@ npm i
 ```
 npm run dev
 ```
+
+
+## User Interface
+![Screenshot 2025-03-31 185647](https://github.com/user-attachments/assets/c2b672d2-82d5-40d4-b0ed-ea1e5be6f24b)
+<br> <br>
+
+![Screenshot 2025-03-31 185938](https://github.com/user-attachments/assets/fde1a245-2eb5-4eff-87a8-1c5b7889632b)
+<br> <br>
+
+![Screenshot 2025-03-31 190032](https://github.com/user-attachments/assets/786599e9-4632-45da-bf6e-09a358b51ec0)
+<br> <br>
