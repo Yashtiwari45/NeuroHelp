@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { generateContent } from "../lib/gemini";
-import { MessageSquare, Send, Sparkles } from "lucide-react";
+import { MessageSquare, Send, Sparkles, Brain } from "lucide-react";
 
 const SAMPLE_QUESTIONS = [
   "What are the early signs of Alzheimer's disease?",
@@ -15,10 +15,22 @@ const SAMPLE_QUESTIONS = [
 
 function ChatbotPage() {
   const [messages, setMessages] = useState(
-    [] as Array<{ role: "user" | "assistant"; content: string }>
+    [] as Array<{ role: "user" | "assistant"; content: string; id: string }>
   );
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleSampleQuestion = (question: string) => {
     setInput(question);
@@ -28,9 +40,12 @@ function ChatbotPage() {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
-    setMessages((prev) => [...prev, { role: "user", content: input }]);
+    // Add user message with unique ID
+    const userMessageId = `user-${Date.now()}`;
+    setMessages((prev) => [...prev, { role: "user", content: input, id: userMessageId }]);
     setLoading(true);
-
+    setShowTypingIndicator(true);
+    
     try {
       const request = {
         subject: "Neurology",
@@ -41,6 +56,9 @@ function ChatbotPage() {
         generateVideo: false,
       };
 
+      // Simulate network delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const result = await generateContent(request);
 
       const lines: string[] = [];
@@ -59,17 +77,25 @@ function ChatbotPage() {
 
       const assistantReply = lines.join("\n\n").trim();
 
+      // Simulate typing delay
+      setShowTypingIndicator(false);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Add assistant message with unique ID
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: assistantReply },
+        { role: "assistant", content: assistantReply, id: `assistant-${Date.now()}` },
       ]);
     } catch (error) {
       console.error("Error calling Gemini API:", error);
+      setShowTypingIndicator(false);
+      
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
           content: "Sorry, there was an error. Please try again.",
+          id: `error-${Date.now()}`
         },
       ]);
     } finally {
@@ -79,92 +105,125 @@ function ChatbotPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="bg-gray-800/50 rounded-xl p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6 text-blue-400" />
-          AI Assistant
-        </h1>
-        <p className="text-gray-400">
-          Ask questions about Alzheimer's disease, early detection, or get help interpreting results.
-        </p>
+    <div className="max-w-3xl mx-auto px-4">
+      {/* Header section with fixed blur issue */}
+      <div className="relative mb-6">
+        {/* Background element with blur */}
+        <div className="absolute inset-0 bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-700/50"></div>
+        
+        {/* Content container with hover effect */}
+        <div className="relative p-6 rounded-xl shadow-lg transform hover:scale-[1.02] transition-all duration-300 z-10">
+          <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
+            <MessageSquare className="w-6 h-6 text-blue-400 animate-pulse" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 will-change-transform">
+              AI Assistant
+            </span>
+          </h1>
+          <p className="text-gray-400">
+            Ask questions about Alzheimer's disease, early detection, or get help interpreting results.
+          </p>
+        </div>
       </div>
 
-      <div className="bg-gray-800/50 rounded-xl h-[500px] flex flex-col">
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {messages.length === 0 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-gray-400">
-                <Sparkles className="w-5 h-5 text-blue-400" />
-                <p>Try asking one of these questions:</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {SAMPLE_QUESTIONS.map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSampleQuestion(question)}
-                    className="text-left p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors text-gray-300 hover:text-white active:bg-blue-500 active:text-white"
-                  >
-                    {question}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg p-4 ${message.role === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-700 text-gray-200"
-                  }`}
-              >
-                {message.role === "assistant" ? (
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {message.content}
-                  </ReactMarkdown>
-                ) : (
-                  message.content
-                )}
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-700 text-gray-200 rounded-lg p-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+      {/* Chat container with a similar fix for the blur issue */}
+      <div className="relative h-[500px] rounded-xl overflow-hidden">
+        {/* Background with blur */}
+        <div className="absolute inset-0 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50"></div>
+        
+        {/* Content container */}
+        <div className="relative h-full flex flex-col shadow-xl z-10">
+          <div 
+            ref={chatContainerRef} 
+            className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
+          >
+            {messages.length === 0 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Brain className="w-5 h-5 text-blue-400 animate-pulse" />
+                  <p>Try asking one of these questions:</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {SAMPLE_QUESTIONS.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSampleQuestion(question)}
+                      className="text-left p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-all duration-300 text-gray-300 hover:text-white active:bg-blue-500 active:text-white hover:shadow-md hover:shadow-blue-900/20 transform hover:scale-[1.02] animate-fade-in-up"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      {question}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
 
-        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-700">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
-            >
-              <Send className="w-5 h-5" />
-            </button>
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-slide-in`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-4 shadow-md ${
+                    message.role === "user"
+                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                      : "bg-gradient-to-r from-gray-700 to-gray-800 text-gray-200"
+                  } transform transition-all duration-300 hover:shadow-lg ${
+                    message.role === "user" ? "hover:shadow-blue-500/20" : "hover:shadow-gray-600/20"
+                  }`}
+                >
+                  {message.role === "assistant" ? (
+                    <div className="prose prose-invert prose-sm max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    message.content
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {showTypingIndicator && (
+              <div className="flex justify-start animate-fade-in">
+                <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-gray-200 rounded-lg p-4 shadow-md">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-90" />
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-90" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-90" style={{ animationDelay: '0.4s' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="p-4 border-t border-gray-700 bg-gray-800/70">
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 shadow-inner placeholder-gray-400"
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                disabled={loading || !input.trim()}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-3 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:shadow-blue-500/20 transform hover:scale-105"
+              >
+                <Send className={`w-5 h-5 ${loading ? 'animate-pulse' : ''}`} />
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      {/* Add a subtle brain pattern in the background */}
+      <div className="fixed inset-0 -z-10 bg-gray-900 opacity-50 pointer-events-none">
+        <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJ3aGl0ZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMzYgMzRjMC0yLjItMS44LTQtNC00cy00IDEuOC00IDQgMS44IDQgNCA0IDQtMS44IDQtNHoiLz48L2c+PC9zdmc+')] animate-pulse-slow" />
       </div>
     </div>
   );
