@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* A nice smooth scroll for the whole app */
+  html {
+    scroll-behavior: smooth;
+  }
+  /* Custom scrollbar for a cleaner look */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1a202c; /* dark-gray */
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #4a5568; /* medium-gray */
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #718096; /* light-gray */
+  }
+}
+
+/* NEW: Add our custom keyframe animations here 
+*/
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* NEW: Create utility classes for our animations
+  This lets us use them in Tailwind like "animate-fade-in-up"
+*/
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+  .animate-shake {
+    animation: shake 0.5s ease-in-out forwards;
+  }
+}

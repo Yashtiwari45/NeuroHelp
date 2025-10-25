@@ -1,10 +1,13 @@
+// src/App.tsx
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { BrainCircuit, Home, AlertCircle, Users, MessageSquareMore } from 'lucide-react';
+import { BrainCircuit, Home, AlertCircle, Users, MessageSquareMore, Database } from 'lucide-react'; // <-- 1. ADDED 'Database' ICON
 import HomePage from './pages/HomePage';
 import PredictionPage from './pages/PredictionPage';
 import ChatbotPage from './pages/ChatbotPage';
 import TeamPage from './pages/TeamPage';
+import TabularPredictionPage from './pages/TabularPredictionPage'; // <-- 2. IMPORTED THE NEW PAGE
 
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   const location = useLocation();
@@ -29,25 +32,27 @@ function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
       <header className="border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img 
-                src="https://img.freepik.com/free-vector/alzheimer-disease-composition-with-senior-man_1284-64661.jpg?w=360&t=st=1701487425~exp=1701488025~hmac=2cb12c9242a61401bf9614302808f4b79773283851cb9d4694425d56b6b0d10b" 
-                alt="NeuraScan AI Logo" 
-                className="w-10 h-10 rounded-full"
-              />
-              <h1 className="text-2xl font-bold">NeuraScan AI</h1>
-            </div>
-            
-            <nav className="flex items-center gap-2">
+          <div className="flex justify-between items-center">
+            <Link to="/" className="flex items-center gap-2 text-xl font-bold">
+              <BrainCircuit className="w-6 h-6 text-blue-400" />
+              <span>Alzheimer's AI</span>
+            </Link>
+            <nav className="hidden md:flex items-center space-x-2">
               <NavLink to="/">
                 <Home className="w-4 h-4" />
                 Home
               </NavLink>
               <NavLink to="/predict">
                 <BrainCircuit className="w-4 h-4" />
-                Predict
+                MRI Predict
               </NavLink>
+              
+              {/* --- 3. ADDED THIS NEW LINK --- */}
+              <NavLink to="/predict-tabular">
+                <Database className="w-4 h-4" />
+                Tabular Predict
+              </NavLink>
+
               <NavLink to="/chat">
                 <MessageSquareMore className="w-4 h-4" />
                 Chat
@@ -87,6 +92,10 @@ function App() {
           <Route path="/predict" element={<PredictionPage />} />
           <Route path="/chat" element={<ChatbotPage />} />
           <Route path="/team" element={<TeamPage />} />
+          
+          {/* --- 4. ADDED THIS NEW ROUTE --- */}
+          <Route path="/predict-tabular" element={<TabularPredictionPage />} /> 
+
         </Routes>
       </Layout>
     </Router>
